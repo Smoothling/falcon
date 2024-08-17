@@ -12,6 +12,8 @@ public class Falcon {
 
     public static void main(String[] args) {
         TomlConfig config = new TomlConfig("config", "falcon-config.toml");
+        config.addDefault("Host", "0.0.0.0");
+        config.addDefault("Port", 25565);
         MinecraftServer.setCompressionThreshold(0);
         MinecraftServer server = MinecraftServer.init();
         MojangAuth.init();
@@ -19,5 +21,6 @@ public class Falcon {
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
         CommandManager commandManager = MinecraftServer.getCommandManager();
         eventHandler.addListener(AsyncPlayerConfigurationEvent.class, new PlayerConfigurationListener().onPlayerConfiguration());
+        server.start(config.get("Host").asString(), config.get("Port").asInteger());
     }
 }
