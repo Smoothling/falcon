@@ -1,43 +1,51 @@
 package click.smoothling.falcon;
 
+import click.smoothling.falcon.command.FlyCommand;
+import click.smoothling.falcon.listener.InventoryListener;
+import click.smoothling.falcon.listener.PingListener;
 import click.smoothling.falcon.listener.PlayerConfigurationListener;
+import click.smoothling.falcon.listener.SpawnListener;
 import de.eztxm.config.TomlConfig;
 import de.eztxm.simplelogger.SimpleLogger;
-import de.eztxm.simplelogger.color.LoggerColor;
 import lombok.Getter;
 import net.minestom.server.MinecraftServer;
 import net.minestom.server.command.CommandManager;
 import net.minestom.server.event.GlobalEventHandler;
+import net.minestom.server.event.inventory.InventoryClickEvent;
 import net.minestom.server.event.player.AsyncPlayerConfigurationEvent;
+import net.minestom.server.event.player.PlayerSpawnEvent;
+import net.minestom.server.event.server.ServerListPingEvent;
 import net.minestom.server.extras.MojangAuth;
-import org.slf4j.LoggerFactory;
 
 public class Falcon {
     @Getter private static SimpleLogger logger;
     @Getter private static TomlConfig config;
 
     public static void main(String[] args) {
-        LoggerFactory.getLogger(Falcon.class);
-        logger = new SimpleLogger();
-        logger.custom(LoggerColor.ANSI_WHITE + "Initialized " + LoggerColor.ANSI_BLUE + "falcon-logger.");
+        logger = new SimpleLogger("falcon> ");
+        logger.info("Initialized falcon-logger.");
         config = new TomlConfig("config", "falcon-config.toml");
         config.addDefault("Host", "0.0.0.0");
         config.addDefault("Port", 25565);
-        logger.custom(LoggerColor.ANSI_WHITE + "Initialized " + LoggerColor.ANSI_BLUE + "falcon-config.");
+        logger.info("Initialized falcon-config.");
         MinecraftServer.setCompressionThreshold(0);
-        logger.custom(LoggerColor.ANSI_WHITE + "Set compression threshold.");
+        logger.info("Set compression threshold.");
         MinecraftServer server = MinecraftServer.init();
         MinecraftServer.setBrandName("Falcon");
-        logger.custom(LoggerColor.ANSI_WHITE + "Initialized " + LoggerColor.ANSI_BLUE + "minecraft server.");
+        logger.info("Initialized minecraft server.");
         MojangAuth.init();
-        logger.custom(LoggerColor.ANSI_WHITE + "Initialized " + LoggerColor.ANSI_BLUE + "mojang auth.");
+        logger.info("Initialized mojang auth.");
         GlobalEventHandler eventHandler = MinecraftServer.getGlobalEventHandler();
-        logger.custom(LoggerColor.ANSI_WHITE + "Initialized " + LoggerColor.ANSI_BLUE + "global eventhandler.");
+        logger.info("Initialized global eventhandler.");
+        eventHandler.addListener(ServerListPingEvent.class, new PingListener().onServerListPing());
         eventHandler.addListener(AsyncPlayerConfigurationEvent.class, new PlayerConfigurationListener().onPlayerConfiguration());
-        logger.custom(LoggerColor.ANSI_WHITE + "Initialized " + LoggerColor.ANSI_BLUE + "global event listener.");
+        eventHandler.addListener(PlayerSpawnEvent.class, new SpawnListener().onPlayerSpawn());
+        eventHandler.addListener(InventoryClickEvent.class, new InventoryListener().onInventoryClick());
+        logger.info("Initialized global event listener.");
         CommandManager commandManager = MinecraftServer.getCommandManager();
-        logger.custom(LoggerColor.ANSI_WHITE + "Initialized " + LoggerColor.ANSI_BLUE + "command manager.");
+        commandManager.register(new FlyCommand());
+        logger.info("Initialized command manager.");
         server.start(config.get("Host").asString(), config.get("Port").asInteger());
-        logger.custom(LoggerColor.ANSI_GREEN + "Started " + LoggerColor.ANSI_BLUE + "Falcon " + LoggerColor.ANSI_GREEN + "on " + config.get("Host").asString() + ":" + config.get("Port").asInteger() + ".");
+        logger.info("Started Falcon on " + config.get("Host").asString() + ":" + config.get("Port").asInteger() + ".");
     }
 }
