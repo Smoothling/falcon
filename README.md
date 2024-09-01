@@ -4,8 +4,8 @@ Falcon is a minestom-based lobbyserver which should be fast and optimized for lo
 
 ## Features
 
-[ ] Database-Support: MongoDB, MariaDB & SQLite
-[ ] Cosmetics
-[ ] Navigator
-[ ] Full configurable
-[ ] Own script system
+- [ ] Database-Support: MongoDB, MariaDB & SQLite
+- [ ] Cosmetics
+- [ ] Navigator
+- [ ] Full configurable
+- [ ] Own script system
